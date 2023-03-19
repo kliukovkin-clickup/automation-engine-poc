@@ -59,20 +59,48 @@ describe("Comparator", () => {
   });
 });
 
-// describe('Comparator create a map of ruleMatchers', () => {
-//   it('should create a map entry', () => {
-//     const pattern: Pattern = {
-//       name: "Peter",
-//       age: 15,
-//     };
-//     const comparator = new Comparator([pattern]);
-//     expect(comparator.rulesMap.size).toBe(2);
-//   });
-//   it('should resolve coalisions', () => {
-//     const patterns: Pattern[] = [
-
-//     ];
-//   });
-// });
+describe('Comparator create a map of ruleMatchers', () => {
+  it('should save two rules to map, each shoud has refference to a pattern', () => {
+    let pattern: Pattern = {
+      name: "Peter",
+      age: 15,
+    };
+    let comparator = new Comparator([pattern]);
+    expect(comparator.rulesMap.size).toBe(2);
+    const rules = comparator.rulesMap.values();
+    for(const rule of rules) {
+      expect(rule.patterns.length).toEqual(1);
+      expect(rule.patterns[0].pattern).toBe(pattern);
+    }
+  });
+  it('should resolve collisions(two patterns, one collision rule)', () => {
+    const patterns: Pattern[] = [
+      {
+        rule1: true,
+        rule2: false,
+      },
+      {
+        rule1: true,
+        rule3: true,
+      }
+    ];
+    const comparator = new Comparator(patterns);
+    expect(comparator.rulesMap.size).toBe(3);
+  });
+  it('should resolve collisions(two patterns with exact same set of rules)', () => {
+    const patterns: Pattern[] = [
+      {
+        rule1: true,
+        rule2: false,
+      },
+      {
+        rule1: true,
+        rule2: false,
+      }
+    ];
+    const comparator = new Comparator(patterns);
+    expect(comparator.rulesMap.size).toBe(2);
+  })
+});
 
 

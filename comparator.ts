@@ -1,4 +1,4 @@
-import { PatternWithScore, RuleMatcher } from './ruleMatcher';
+import { PatternWithScore, Rule } from './ruleMatcher';
 
 export interface Pattern {
   [key: string]: string | number | boolean;
@@ -18,7 +18,7 @@ export interface MatchResult {
 
 
 export class Comparator {
-  public rulesMap: Map<string, RuleMatcher> = new Map();
+  public rulesMap: Map<string, Rule> = new Map();
   private patternsWithScore: PatternWithScore[];
   constructor(patterns: Pattern[]) {
     this.patternsWithScore = patterns.map(pattern => ({pattern, score: 0}));
@@ -32,9 +32,9 @@ export class Comparator {
         const value = pattern[key];
         const strKey = `key=${key}:value=${value}`;
         if (!this.rulesMap.has(strKey)) {
-          this.rulesMap.set(strKey, new RuleMatcher(key, value));
+          this.rulesMap.set(strKey, new Rule(key, value));
         }
-        const matcher = this.rulesMap.get(strKey) as RuleMatcher;
+        const matcher = this.rulesMap.get(strKey) as Rule;
         matcher.addPattern(patternWithScore);
       }
     })
@@ -49,7 +49,7 @@ export class Comparator {
       const value = item[key];
       const strKey = `key=${key}:value=${value}`;
       if (!this.rulesMap.has(strKey)) continue;
-      const matcher = this.rulesMap.get(strKey) as RuleMatcher;
+      const matcher = this.rulesMap.get(strKey) as Rule;
       matcher.incrementScores();
     }
   }

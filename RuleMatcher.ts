@@ -8,7 +8,7 @@ export interface PatternWithScore {
   pattern: Pattern;
   score: number;
 }
-export class RuleMatcher {
+export class Rule {
   key: string;
   value: string | number | boolean;
   patterns: PatternWithScore[];
