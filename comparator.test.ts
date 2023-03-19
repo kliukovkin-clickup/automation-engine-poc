@@ -103,6 +103,9 @@ describe('Comparator create a map of ruleMatchers', () => {
   })
 });
 
+/*
+ * time complexity: O(K + N), where K is a total number of rules and N is a number of patterns
+ */
 describe('find match for item', () => {
   it('should find matches, item is applicable to all patterns', () => {
     const pattern1: Pattern = {

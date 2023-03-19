@@ -44,6 +44,21 @@ export class Comparator {
     this.patternsWithScore.forEach(pattern => pattern.score = 0);
   }
 
+  /* 
+  time complexity O(N), where N is a number of patterns
+  */
+  private getMatchedPatterns() {
+    return this.patternsWithScore.reduce((matchPatterns, {pattern, score}) => {
+      if (Object.keys(pattern).length === score) {
+        matchPatterns.push(pattern);
+      }
+      return matchPatterns;
+    }, [] as Pattern[]);
+  }
+  
+  /* 
+  time complexity O(K), where K is a total number of rules
+  */
   public findMatch(item: Item) {
     const result: MatchResult = {
       item,
@@ -57,12 +72,7 @@ export class Comparator {
       rule.incrementScores();
     }
 
-    result.matchPatterns = this.patternsWithScore.reduce((matchPatterns, {pattern, score}) => {
-      if (Object.keys(pattern).length === score) {
-        matchPatterns.push(pattern);
-      }
-      return matchPatterns;
-    }, [] as Pattern[]);
+    result.matchPatterns = this.getMatchedPatterns();
 
     return result;
   }
