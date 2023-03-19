@@ -1,4 +1,4 @@
-import { PatternWithScore, Rule } from './ruleMatcher';
+import { PatternWithScore, Rule } from './rule';
 
 export interface Pattern {
   [key: string]: string | number | boolean;
