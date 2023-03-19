@@ -103,4 +103,46 @@ describe('Comparator create a map of ruleMatchers', () => {
   })
 });
 
-
+describe('find match for item', () => {
+  it('should find matches, item is applicable to all patterns', () => {
+    const pattern1: Pattern = {
+      rule1: 'a',
+      rule2: false,
+    };
+    const pattern2: Pattern = {
+      rule3: 'b',
+      rule4: true,
+    };
+    const item: Item = {
+      rule1: 'a',
+      rule2: false,
+      rule3: 'b',
+      rule4: true,
+    }
+  
+    const comparator = new Comparator([pattern1, pattern2]);
+    const result = comparator.findMatch(item);
+    expect(result.matchPatterns.includes(pattern1)).toBeTruthy();
+    expect(result.matchPatterns.includes(pattern2)).toBeTruthy();
+  });
+  it('should not find any matches, no applicable patterns for the item', () => {
+    const pattern1: Pattern = {
+      rule1: 'a',
+      rule2: false,
+    };
+    const pattern2: Pattern = {
+      rule3: 'b',
+      rule4: true,
+    };
+    const item: Item = {
+      rule1: 'b',
+      rule2: false,
+      rule3: 'a',
+      rule4: true,
+    }
+  
+    const comparator = new Comparator([pattern1, pattern2]);
+    const result = comparator.findMatch(item);
+    expect(result.matchPatterns.length).toEqual(0);``
+  });
+});

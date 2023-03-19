@@ -44,35 +44,35 @@ export class Comparator {
     this.patternsWithScore.forEach(pattern => pattern.score = 0);
   }
 
-  public fillMatchers(item) {
+  public findMatch(item: Item) {
+    const result: MatchResult = {
+      item,
+      matchPatterns: []
+    };
     for (const key in item) {
       const value = item[key];
       const strKey = `key=${key}:value=${value}`;
       if (!this.rulesMap.has(strKey)) continue;
-      const matcher = this.rulesMap.get(strKey) as Rule;
-      matcher.incrementScores();
+      const rule = this.rulesMap.get(strKey) as Rule;
+      rule.incrementScores();
     }
+
+    result.matchPatterns = this.patternsWithScore.reduce((matchPatterns, {pattern, score}) => {
+      if (Object.keys(pattern).length === score) {
+        matchPatterns.push(pattern);
+      }
+      return matchPatterns;
+    }, [] as Pattern[]);
+
+    return result;
   }
 
   public findMatches(items: Item[]) {
     const results: MatchResult[] = [];
-    items.forEach((item, itemIndex) => {
+    items.forEach((item) => {
       this.resetScores();
-      this.fillMatchers(item);
-
-      const result: MatchResult = {
-        item,
-        matchPatterns: []
-      };
-
-      this.patternsWithScore.forEach(({pattern, score}) => {
-        if (Object.keys(pattern).length === score) {
-          result.matchPatterns.push(pattern);
-        }
-      })
-
+      const result = this.findMatch(item);
       results.push(result);  
-      
     })
     return results;
 
