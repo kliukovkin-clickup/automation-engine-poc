@@ -1,37 +1,29 @@
 /*
- * RuleMatcher exists per rule. Since multiple patterns may have same rule.
+ * RuleMatcher exists per rule. Since multiple patterns may have the same rule.
  */
+
+import { Pattern } from './comparator';
+
+export interface PatternWithScore {
+  pattern: Pattern;
+  score: number;
+}
 export class RuleMatcher {
   key: string;
   value: string | number | boolean;
-  patternMatches: { [key: number]: number } = {};
+  patterns: PatternWithScore[];
 
   constructor(key: string, value: string | number | boolean) {
     this.key = key;
     this.value = value;
-  }
-
-  setMatch(index: number, score: number): void {
-    this.patternMatches[index] = score;
-  }
-
-  getMatch(index: number): number {
-    return this.patternMatches[index];
-  }
-
-  resetMatchScores(): void {
-    for (const index in this.patternMatches) {
-      this.patternMatches[index] = 0;
-    }
+    this.patterns = [];
   }
 
   incrementScores(): void {
-    for (const patternIndex in this.patternMatches) {
-      this.patternMatches[patternIndex]++;
-    }
+    this.patterns.forEach(pattern => pattern.score++);
   }
 
-  addPattern(index: number) {
-    this.patternMatches[index] = 0;
+  addPattern(pattern: PatternWithScore) {
+    this.patterns.push(pattern);
   }
 }
