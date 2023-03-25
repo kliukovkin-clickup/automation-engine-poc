@@ -1,7 +1,7 @@
 import { PatternWithScore, Rule } from './rule';
 
 export interface Pattern {
-  [key: string]: string | number | boolean;
+  [key: string]: any;
 }
 
 export interface Item {
@@ -30,14 +30,28 @@ export class Engine {
       const {pattern} = patternWithScore;
       for (const key in pattern) {
         const value = pattern[key];
-        const strKey = `key=${key}:value=${value}`;
-        if (!this.matrix.has(strKey)) {
-          this.matrix.set(strKey, new Rule(key, value));
+        if (Array.isArray(value)) {
+          this.addArrayRulesToMatrix(key, value, patternWithScore);
+        } else {
+          this.addRuleToMatrix(key, value, patternWithScore);
         }
-        const matcher = this.matrix.get(strKey) as Rule;
-        matcher.addPattern(patternWithScore);
       }
     })
+  }
+
+  private addArrayRulesToMatrix(key: string, values: any[], patternWithScore: PatternWithScore): void {
+    for (const value of values) {
+      this.addRuleToMatrix(key, value, patternWithScore);
+    }
+  }
+
+  private addRuleToMatrix(key: string, value: any, patternWithScore: PatternWithScore): void {
+    const strKey = `key=${key}:value=${value}`;
+    if (!this.matrix.has(strKey)) {
+      this.matrix.set(strKey, new Rule(key, value));
+    }
+    const matcher = this.matrix.get(strKey) as Rule;
+    matcher.addPattern(patternWithScore);
   }
 
   private resetScores() {
@@ -60,6 +74,7 @@ export class Engine {
   time complexity O(K), where K is a total number of rules
   */
   public findMatch(item: Item): MatchResult {
+    this.resetScores();
     const result: MatchResult = {
       item,
       matchPatterns: []
@@ -80,7 +95,6 @@ export class Engine {
   public findMatches(items: Item[]): MatchResult[] {
     const results: MatchResult[] = [];
     items.forEach((item) => {
-      this.resetScores();
       const result = this.findMatch(item);
       results.push(result);  
     })

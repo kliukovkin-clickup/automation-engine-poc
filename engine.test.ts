@@ -50,8 +50,8 @@ describe("Engine", () => {
       },
     ];
 
-    const comparator = new Engine(patterns);
-    const result = comparator.findMatches(items);
+    const engine = new Engine(patterns);
+    const result = engine.findMatches(items);
 
     expect(result[0].item).toBe(item);
     expect(result[0].matchPatterns[0]).toBe(patternToBeMatched);
@@ -59,15 +59,15 @@ describe("Engine", () => {
   });
 });
 
-describe('Comparator create a map of ruleMatchers', () => {
+describe('engine create a map of ruleMatchers', () => {
   it('should save two rules to map, each shoud has refference to a pattern', () => {
     let pattern: Pattern = {
       name: "Peter",
       age: 15,
     };
-    let comparator = new Engine([pattern]);
-    expect(comparator.matrix.size).toBe(2);
-    const rules = comparator.matrix.values();
+    let engine = new Engine([pattern]);
+    expect(engine.matrix.size).toBe(2);
+    const rules = engine.matrix.values();
     for(const rule of rules) {
       expect(rule.patterns.length).toEqual(1);
       expect(rule.patterns[0].pattern).toBe(pattern);
@@ -84,8 +84,8 @@ describe('Comparator create a map of ruleMatchers', () => {
         rule3: true,
       }
     ];
-    const comparator = new Engine(patterns);
-    expect(comparator.matrix.size).toBe(3);
+    const engine = new Engine(patterns);
+    expect(engine.matrix.size).toBe(3);
   });
   it('should resolve collisions(two patterns with exact same set of rules)', () => {
     const patterns: Pattern[] = [
@@ -98,15 +98,12 @@ describe('Comparator create a map of ruleMatchers', () => {
         rule2: false,
       }
     ];
-    const comparator = new Engine(patterns);
-    expect(comparator.matrix.size).toBe(2);
+    const engine = new Engine(patterns);
+    expect(engine.matrix.size).toBe(2);
   })
-});
-
-/*
- * time complexity: O(K + N), where K is a total number of rules and N is a number of patterns
- */
-describe('find match for item', () => {
+  /*
+    * time complexity: O(K + N), where K is a total number of rules and N is a number of patterns
+    */
   it('should find matches, item is applicable to all patterns', () => {
     const pattern1: Pattern = {
       rule1: 'a',
@@ -123,8 +120,8 @@ describe('find match for item', () => {
       rule4: true,
     }
   
-    const comparator = new Engine([pattern1, pattern2]);
-    const result = comparator.findMatch(item);
+    const engine = new Engine([pattern1, pattern2]);
+    const result = engine.findMatch(item);
     expect(result.matchPatterns.includes(pattern1)).toBeTruthy();
     expect(result.matchPatterns.includes(pattern2)).toBeTruthy();
   });
@@ -144,8 +141,45 @@ describe('find match for item', () => {
       rule4: true,
     }
   
-    const comparator = new Engine([pattern1, pattern2]);
-    const result = comparator.findMatch(item);
+    const engine = new Engine([pattern1, pattern2]);
+    const result = engine.findMatch(item);
     expect(result.matchPatterns.length).toEqual(0);``
+  });
+  it('OR values: should create matrix for rules with Array', () => {
+    const pattern: Pattern = {
+      rule: ['a', 'b', 'c'],
+    };
+    const engine = new Engine([pattern]);
+    expect(engine.matrix.size).toBe(3);
+    const rules = engine.matrix.values();
+    for(const rule of rules) {
+      expect(rule.patterns[0].pattern).toBe(pattern);
+    }
+  });
+  it('OR values: consider it as ANY value', () => {
+    const pattern: Pattern = {
+      rule: ['a', 'b', 'c'],
+    };
+    const item1: Item = {
+      rule: 'a',
+    };
+    const item2: Item = {
+      rule: 'b',
+    };
+    const item3: Item = {
+      rule: 'c',
+    };
+    const item4: Item = {
+      rule: 'd',
+    };
+    const engine = new Engine([pattern]);
+    let result = engine.findMatch(item1);
+    expect(result.matchPatterns.includes(pattern)).toBeTruthy();
+    result = engine.findMatch(item2);
+    expect(result.matchPatterns.includes(pattern)).toBeTruthy();
+    result = engine.findMatch(item3);
+    expect(result.matchPatterns.includes(pattern)).toBeTruthy();
+    result = engine.findMatch(item4);
+    expect(result.matchPatterns.includes(pattern)).toBeFalsy();
   });
 });
