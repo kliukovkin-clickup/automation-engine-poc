@@ -17,8 +17,8 @@ export interface MatchResult {
 
 
 
-export class Comparator {
-  public rulesMap: Map<string, Rule> = new Map();
+export class Engine {
+  public matrix: Map<string, Rule> = new Map();
   private patternsWithScore: PatternWithScore[];
   constructor(patterns: Pattern[]) {
     this.patternsWithScore = patterns.map(pattern => ({pattern, score: 0}));
@@ -31,10 +31,10 @@ export class Comparator {
       for (const key in pattern) {
         const value = pattern[key];
         const strKey = `key=${key}:value=${value}`;
-        if (!this.rulesMap.has(strKey)) {
-          this.rulesMap.set(strKey, new Rule(key, value));
+        if (!this.matrix.has(strKey)) {
+          this.matrix.set(strKey, new Rule(key, value));
         }
-        const matcher = this.rulesMap.get(strKey) as Rule;
+        const matcher = this.matrix.get(strKey) as Rule;
         matcher.addPattern(patternWithScore);
       }
     })
@@ -47,7 +47,7 @@ export class Comparator {
   /* 
   time complexity O(N), where N is a number of patterns
   */
-  private getMatchedPatterns() {
+  private getMatchedPatterns(): Pattern[] {
     return this.patternsWithScore.reduce((matchPatterns, {pattern, score}) => {
       if (Object.keys(pattern).length === score) {
         matchPatterns.push(pattern);
@@ -59,7 +59,7 @@ export class Comparator {
   /* 
   time complexity O(K), where K is a total number of rules
   */
-  public findMatch(item: Item) {
+  public findMatch(item: Item): MatchResult {
     const result: MatchResult = {
       item,
       matchPatterns: []
@@ -67,8 +67,8 @@ export class Comparator {
     for (const key in item) {
       const value = item[key];
       const strKey = `key=${key}:value=${value}`;
-      if (!this.rulesMap.has(strKey)) continue;
-      const rule = this.rulesMap.get(strKey) as Rule;
+      if (!this.matrix.has(strKey)) continue;
+      const rule = this.matrix.get(strKey) as Rule;
       rule.incrementScores();
     }
 
@@ -77,7 +77,7 @@ export class Comparator {
     return result;
   }
 
-  public findMatches(items: Item[]) {
+  public findMatches(items: Item[]): MatchResult[] {
     const results: MatchResult[] = [];
     items.forEach((item) => {
       this.resetScores();

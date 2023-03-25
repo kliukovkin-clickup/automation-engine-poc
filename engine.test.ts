@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
-import { Comparator, Item, Pattern } from './comparator';
+import { Engine, Item, Pattern } from './engine';
 
-describe("Comparator", () => {
+describe("Engine", () => {
   it("test", () => {
     const item: Item =       {
       name: "Andrew",
@@ -50,7 +50,7 @@ describe("Comparator", () => {
       },
     ];
 
-    const comparator = new Comparator(patterns);
+    const comparator = new Engine(patterns);
     const result = comparator.findMatches(items);
 
     expect(result[0].item).toBe(item);
@@ -65,9 +65,9 @@ describe('Comparator create a map of ruleMatchers', () => {
       name: "Peter",
       age: 15,
     };
-    let comparator = new Comparator([pattern]);
-    expect(comparator.rulesMap.size).toBe(2);
-    const rules = comparator.rulesMap.values();
+    let comparator = new Engine([pattern]);
+    expect(comparator.matrix.size).toBe(2);
+    const rules = comparator.matrix.values();
     for(const rule of rules) {
       expect(rule.patterns.length).toEqual(1);
       expect(rule.patterns[0].pattern).toBe(pattern);
@@ -84,8 +84,8 @@ describe('Comparator create a map of ruleMatchers', () => {
         rule3: true,
       }
     ];
-    const comparator = new Comparator(patterns);
-    expect(comparator.rulesMap.size).toBe(3);
+    const comparator = new Engine(patterns);
+    expect(comparator.matrix.size).toBe(3);
   });
   it('should resolve collisions(two patterns with exact same set of rules)', () => {
     const patterns: Pattern[] = [
@@ -98,8 +98,8 @@ describe('Comparator create a map of ruleMatchers', () => {
         rule2: false,
       }
     ];
-    const comparator = new Comparator(patterns);
-    expect(comparator.rulesMap.size).toBe(2);
+    const comparator = new Engine(patterns);
+    expect(comparator.matrix.size).toBe(2);
   })
 });
 
@@ -123,7 +123,7 @@ describe('find match for item', () => {
       rule4: true,
     }
   
-    const comparator = new Comparator([pattern1, pattern2]);
+    const comparator = new Engine([pattern1, pattern2]);
     const result = comparator.findMatch(item);
     expect(result.matchPatterns.includes(pattern1)).toBeTruthy();
     expect(result.matchPatterns.includes(pattern2)).toBeTruthy();
@@ -144,7 +144,7 @@ describe('find match for item', () => {
       rule4: true,
     }
   
-    const comparator = new Comparator([pattern1, pattern2]);
+    const comparator = new Engine([pattern1, pattern2]);
     const result = comparator.findMatch(item);
     expect(result.matchPatterns.length).toEqual(0);``
   });

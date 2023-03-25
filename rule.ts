@@ -2,7 +2,7 @@
  * RuleMatcher exists per rule. Since multiple patterns may have the same rule.
  */
 
-import { Pattern } from './comparator';
+import { Pattern } from './engine';
 
 export interface PatternWithScore {
   pattern: Pattern;
