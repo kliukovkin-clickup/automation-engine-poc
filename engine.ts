@@ -27,16 +27,44 @@ export class Engine {
 
   private createPatternsMap(): void {
     this.patternsWithScore.forEach((patternWithScore) => {
+      const nestedRules = {};
       const {pattern} = patternWithScore;
       for (const key in pattern) {
         const value = pattern[key];
         if (Array.isArray(value)) {
           this.addArrayRulesToMatrix(key, value, patternWithScore);
+        } else if (typeof value === 'object') {
+          Object.assign(nestedRules, Engine.flatObjectField(value, key));
         } else {
           this.addRuleToMatrix(key, value, patternWithScore);
         }
       }
+
+      for (const key in nestedRules) {
+        const value = nestedRules[key];
+          if (Array.isArray(value)) {
+            this.addArrayRulesToMatrix(key, value, patternWithScore);
+          } else {
+            this.addRuleToMatrix(key, value, patternWithScore);
+          }
+      }
     })
+    
+
+  }
+
+  private static flatObjectField(obj: object, prevKey: string) {
+    const result = {};
+    const leftOvers = {};
+    for (const key in obj) {
+      const value = obj[key];
+      if (typeof value === 'object') {
+        Object.assign(leftOvers, Engine.flatObjectField(value, `${prevKey}.${key}`));
+      } else {
+        result[`${prevKey}.${key}`] = value;
+      }
+    }
+    return Object.assign(result, leftOvers);
   }
 
   private addArrayRulesToMatrix(key: string, values: any[], patternWithScore: PatternWithScore): void {

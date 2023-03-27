@@ -182,4 +182,24 @@ describe('engine create a map of ruleMatchers', () => {
     result = engine.findMatch(item4);
     expect(result.matchPatterns.includes(pattern)).toBeFalsy();
   });
+  it('NESTED values: consider it as a flat values', () => {
+    const pattern: Pattern = {
+      rule: {
+        rule: {
+          rule: {
+            rule: "value"
+          }
+        }
+      }
+    };
+
+    const engine = new Engine([pattern]);
+    expect(engine.matrix.size).toBe(1);
+    const key = 'rule.rule.rule.rule';
+    expect(engine.matrix.has(`key=${key}:value=${'value'}`)).toBeTruthy();
+    const rules = engine.matrix.values();
+    for(const rule of rules) {
+      expect(rule.patterns[0].pattern).toBe(pattern);
+    }
+  });
 });
